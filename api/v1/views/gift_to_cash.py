@@ -7,6 +7,28 @@ from api.v1.views import app_views
 
 from integrations.assembly.assembly_integration import AssemblyItem
 from integrations.marqeta.marqeta_integration import Marqeta
+from integrations.capitol_one.verify import Verify
+
+@app_views.route("/verify/button", methods=['GET'], strict_slashes=False)
+def get_button():
+    v = Verify()
+
+    return v.get_button()
+
+@app_views.route("/verify/", methods=['GET'], strict_slashes=False)
+def verify_identity():
+    v = Verify()
+    v.get_second_access()
+
+    status = v.verify()
+
+    if status != 204:
+        abort(400, "Something went wrong")
+
+    resp = jsonify({"status": status})
+    resp.status_code = 204
+
+    return resp
 
 
 @app_views.route("/gift", methods=['POST'], strict_slashes=False)
