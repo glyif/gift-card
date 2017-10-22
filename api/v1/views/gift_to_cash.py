@@ -6,6 +6,7 @@ from flask import jsonify, request, abort
 from api.v1.views import app_views
 
 from integrations.assembly.assembly_integration import AssemblyItem
+from integrations.marqeta.marqeta_integration import Marqeta
 
 
 @app_views.route("/gift", methods=['POST'], strict_slashes=False)
@@ -25,12 +26,14 @@ def gift_to_cash():
             abort(400, 'Missing ' + req)
 
     # create escrow for gift card hold, makes transactions and attempts to pay
-    escrow = AssemblyItem();
+    escrow = AssemblyItem()
 
-    if escrow != "payment_deposited":
-        abort(401, "Payment Error: " + escrow)
+    if escrow.state != "payment_deposited":
+        abort(401, "Payment Error: " + escrow.state)
 
-    resp = jsonify({"OK"})
-    resp.status_code = 2010
+    money = Marqeta(escrow.item_id)
+
+    resp = jsonify({"payment": "OK"})
+    resp.status_code = 200
 
     return resp
