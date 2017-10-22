@@ -15,11 +15,12 @@ class AssemblyItem:
         """
         initializes Assembly
         """
-        self.item_id = uuid4()
+        self.item_id = str(uuid4())
         self.base_url = "https://test.api.promisepay.com"
         self.authorization = getenv("ASS_AUTH")
-        self.buyer = "3f5a7622-4459-567a-f8e1-024c69954fdc"
-        self.seller = "1740bd52-89a3-acae-47d9-2f9fd53d7dd3"
+        self.buyer = getenv("ASS_BUYER_ID")
+        self.seller = getenv("ASS_SELLER_ID")
+        self.state = ""
 
         self.create_item()
         self.make_payment()
@@ -74,9 +75,6 @@ class AssemblyItem:
             "device_id": "sample device ID"
         }
 
-        print(data);
-
         r = requests.patch(url=payment_url, headers=headers, data=data)
-        print(r.json())
 
-        return r.json().get("items").get("state")
+        self.state = r.json().get("items").get('state')
